@@ -1,42 +1,28 @@
 package searcher
 
-import (
-	"time"
-)
-
 // 价值
 type Weights struct {
-	Weight     float64
-	CreateTime time.Time
-	UpdateTime time.Time
+	Weight float64
 }
 
 func NewWeights() *Weights {
 	return &Weights{
-		Weight:     0,
-		CreateTime: time.Now(),
-		UpdateTime: time.Now(),
+		Weight: 0,
 	}
 }
 
 func (t *Weights) AddValue(v float64) {
 	t.Weight += v
-	t.UpdateTime = time.Now()
 }
 
 func (t *Weights) Sum(w *Weights) *Weights {
-	r := Weights{
-		Weight: t.Weight + w.Weight,
+	w0 := t.Clone()
+	w0.AddValue(w.Weight)
+	return w0
+}
+
+func (t *Weights) Clone() *Weights {
+	return &Weights{
+		Weight: t.Weight,
 	}
-	if t.CreateTime.Before(w.CreateTime) {
-		r.CreateTime = t.CreateTime
-	} else {
-		r.CreateTime = w.CreateTime
-	}
-	if t.UpdateTime.Before(w.UpdateTime) {
-		r.UpdateTime = w.UpdateTime
-	} else {
-		r.UpdateTime = t.UpdateTime
-	}
-	return &r
 }

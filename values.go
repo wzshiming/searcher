@@ -11,8 +11,13 @@ func NewValues() *Values {
 	}
 }
 
+func (t *Values) Len() int {
+	return len(t.maps)
+}
+
 func (t *Values) Add(p Point, v float64) {
-	t.Get(p).AddValue(v)
+	w := t.Get(p)
+	w.AddValue(v)
 }
 
 func (t *Values) Del(p Point) {
@@ -29,37 +34,51 @@ func (t *Values) Get(p Point) *Weights {
 }
 
 // 并集
-func (t *Values) UnionSet(va *Values) *Values {
+func (t *Values) UnionSet(vas ...*Values) *Values {
 	vs := t.Clone()
-	for k, v := range va.maps {
-		m, ok := vs.maps[k]
-		if ok {
-			vs.maps[k] = m.Sum(va.maps[k])
+	for _, va := range vas {
+		for k, v := range va.maps {
+			m, ok := t.maps[k]
+			if ok {
+				vs.maps[k] = m.Sum(v)
+			} else {
+				vs.maps[k] = v.Clone()
+			}
 		}
-		vs.maps[k] = v
 	}
 	return vs
 }
 
 // 交集
-func (t *Values) IntersectionSet(va *Values) *Values {
-	vs := t.Clone()
-	for k, _ := range va.maps {
-		m, ok := vs.maps[k]
-		if ok {
-			vs.maps[k] = m.Sum(va.maps[k])
+func (t *Values) IntersectionSet(vas ...*Values) *Values {
+	vs := NewValues()
+	for _, va := range vas {
+		for k, v := range va.maps {
+			m, ok := t.maps[k]
+			if ok {
+				vs.maps[k] = m.Sum(v)
+			}
 		}
-		vs.Del(k)
 	}
 	return vs
 }
 
-func (t *Values) Sort(f func(Point, *Weights) float64) (ps Points) {
+func (t *Values) Data() (ps Points) {
 	for k, _ := range t.maps {
 		ps = append(ps, k)
 	}
+	return
+}
+
+func (t *Values) Sort(f func(Point, *Weights) float64) (ps Points) {
+	ps = t.Data()
 	ps.Sort(func(a Point, b Point) bool {
-		return f(a, t.Get(a)) < f(b, t.Get(b))
+		aw := f(a, t.Get(a))
+		bw := f(b, t.Get(b))
+		if aw == bw {
+			return Addr(a) < Addr(b)
+		}
+		return aw < bw
 	})
 	return
 }
@@ -67,7 +86,7 @@ func (t *Values) Sort(f func(Point, *Weights) float64) (ps Points) {
 func (t *Values) Clone() *Values {
 	vs := NewValues()
 	for k, v := range t.maps {
-		vs.maps[k] = v
+		vs.maps[k] = v.Clone()
 	}
 	return vs
 }
