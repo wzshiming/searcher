@@ -64,6 +64,7 @@ func (t *Searcher) Get(key string) *Values {
 		}
 		switch len(rets) {
 		case 0:
+			return NewValues()
 		case 1:
 			rets0 = append(rets0, rets[0].Clone())
 		default:
