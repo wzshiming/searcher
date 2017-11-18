@@ -37,20 +37,34 @@ func GroupLanguages(str string) []string {
 	case 1:
 		return []string{str}
 	default:
-		b := d[0] < unicode.MaxASCII
+		b := getLanguages(d[0])
 		r := []string{string([]rune{d[0]})}
 		for _, v := range d[1:] {
-			if b == (v < unicode.MaxASCII) {
+			b0 := getLanguages(v)
+			if b == b0 {
 				r[len(r)-1] = string(append([]rune(r[len(r)-1]), v))
 			} else {
 				r = append(r, string([]rune{v}))
-				b = !b
+				b = b0
 			}
 		}
 		return r
 	}
 
 	return nil
+}
+
+// 区分语言 现在只能区分 数字 英文 和 其他
+func getLanguages(r rune) int {
+	if r < unicode.MaxASCII {
+		if r >= '0' && r <= '9' {
+			return 1
+		} else {
+			return 2
+		}
+	} else {
+		return 3
+	}
 }
 
 // 超简单的分词  列出分词所有可能性 单个词 按字拆分
