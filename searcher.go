@@ -33,6 +33,14 @@ func (t *Searcher) Category(category string) *Searcher {
 	return c
 }
 
+func (t *Searcher) AddBy(drivername string, key string, p Point, value float64) {
+	f := driver[drivername]
+	if f == nil {
+		return
+	}
+	f(t, key, p, value)
+}
+
 func (t *Searcher) Add(key string, p Point, value float64) {
 	t.mut.Lock()
 	defer t.mut.Unlock()
@@ -48,7 +56,7 @@ func (t *Searcher) AddWord(key string, p Point, value float64) {
 func (t *Searcher) Get(key string) *Values {
 	t.mut.RLock()
 	defer t.mut.RUnlock()
-	ks := word.FindAllString(key, -1)
+	ks := Grouping(key)
 	rets0 := []*Values{}
 	for _, k := range ks {
 		rets := []*Values{}

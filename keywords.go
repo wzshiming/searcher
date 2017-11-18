@@ -16,7 +16,7 @@ func NewKeywords() *Keywords {
 }
 
 func (t *Keywords) Add(key string, p Point, value float64) {
-	ks := word.FindAllString(key, -1)
+	ks := Grouping(key)
 	keys := []string{}
 	for _, v := range ks {
 		keys = append(keys, SimpleSegment(v)...)
@@ -40,7 +40,7 @@ func (t *Keywords) AddWord(key string, p Point, value float64) {
 }
 
 //func (t *Keywords) Get(key string) *Values {
-//	ks := word.FindAllString(key, -1)
+//	ks := Grouping(key)
 //	vs := NewValues()
 //	for _, v := range ks {
 //		vs = vs.UnionSet(t.GetWord(v))
